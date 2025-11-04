@@ -1,0 +1,122 @@
+<!-- pages/search/search.wxml -->
+<view class="search-container">
+  <!-- 搜索框 -->
+  <view class="search-bar">
+    <input 
+      placeholder="搜索目的地、景点..." 
+      class="search-input" 
+      focus="{{true}}"
+      bindinput="onSearchInput"
+      bindconfirm="onSearchConfirm"
+      confirm-type="search"
+      value="{{keyword}}"
+    />
+    <button class="search-cancel" bindtap="goBack">取消</button>
+  </view>
+  
+  <!-- 搜索历史 -->
+  <view class="search-history" wx:if="{{!keyword && historyList.length > 0}}">
+    <view class="history-header">
+      <text>搜索历史</text>
+      <text bindtap="clearHistory">清空</text>
+    </view>
+    <view class="history-list">
+      <view 
+        class="history-item" 
+        wx:for="{{historyList}}" 
+        wx:key="*this"
+        bindtap="searchByHistory"
+        data-keyword="{{item}}"
+      >
+        {{item}}
+      </view>
+    </view>
+  </view>
+  
+  <!-- 热门搜索 -->
+  <view class="hot-search" wx:if="{{!keyword}}">
+    <view class="hot-header">热门搜索</view>
+    <view class="hot-list">
+      <view 
+        class="hot-item" 
+        wx:for="{{hotKeywords}}" 
+        wx:key="*this"
+        bindtap="searchByHot"
+        data-keyword="{{item}}"
+      >
+        {{item}}
+      </view>
+    </view>
+  </view>
+  
+  <!-- 搜索结果 -->
+  <view class="search-results" wx:if="{{keyword}}">
+    <view class="result-count">找到{{results.length}}个结果</view>
+    
+    <!-- 目的地结果 -->
+    <view class="result-section" wx:if="{{destinations.length > 0}}">
+      <view class="section-title">目的地</view>
+      <view class="destination-list">
+        <view 
+          class="destination-item" 
+          wx:for="{{destinations}}" 
+          wx:key="id"
+          bindtap="navigateToDestination"
+          data-id="{{item.id}}"
+        >
+          <view class="destination-info">
+            <view class="destination-name">{{item.name}}</view>
+            <view class="destination-desc">{{item.desc}}</view>
+          </view>
+        </view>
+      </view>
+    </view>
+    
+    <!-- 景点结果 -->
+    <view class="result-section" wx:if="{{attractions.length > 0}}">
+      <view class="section-title">景点</view>
+      <view class="attraction-list">
+        <view 
+          class="attraction-item" 
+          wx:for="{{attractions}}" 
+          wx:key="id"
+          bindtap="navigateToAttraction"
+          data-id="{{item.id}}"
+        >
+          <view class="attraction-info">
+            <view class="attraction-name">{{item.name}}</view>
+            <view class="attraction-location">
+              <text class="icon">📍</text>
+              <text>{{item.location}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+    
+    <!-- 攻略结果 -->
+    <view class="result-section" wx:if="{{guides.length > 0}}">
+      <view class="section-title">攻略</view>
+      <view class="guide-list">
+        <view 
+          class="guide-item" 
+          wx:for="{{guides}}" 
+          wx:key="id"
+          bindtap="navigateToGuide"
+          data-id="{{item.id}}"
+        >
+          <view class="guide-title">{{item.title}}</view>
+          <view class="guide-meta">
+            <text>{{item.author}}</text>
+            <text>{{item.views}}浏览</text>
+          </view>
+        </view>
+      </view>
+    </view>
+    
+    <!-- 无结果 -->
+    <view class="no-result" wx:if="{{results.length === 0}}">
+      <view class="no-result-text">没有找到"{{keyword}}"相关结果</view>
+    </view>
+  </view>
+</view>

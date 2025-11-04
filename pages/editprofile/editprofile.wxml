@@ -1,0 +1,31 @@
+<!--pages/editprofile/editprofile.wxml-->
+<view class="edit-profile-container">
+  <view class="form-item">
+    <text class="label">头像</text>
+    <view class="avatar-uploader" bindtap="chooseAvatar">
+      <image src="{{avatarUrl}}" mode="aspectFill"></image>
+      <text>点击更换</text>
+    </view>
+  </view>
+  
+  <view class="form-item">
+    <text class="label">用户名</text>
+    <input 
+      type="text" 
+      placeholder="请输入用户名" 
+      value="{{username}}"
+      bindinput="onUsernameInput"
+    />
+  </view>
+  
+  <view class="form-item">
+    <text class="label">个性签名</text>
+    <textarea 
+      placeholder="介绍一下自己吧" 
+      value="{{bio}}"
+      bindinput="onBioInput"
+    ></textarea>
+  </view>
+  
+  <button class="save-btn" bindtap="saveProfile">保存修改</button>
+</view>

@@ -1,0 +1,95 @@
+<!-- pages/favorites/favorites.wxml -->
+<view class="favorites-container">
+  <!-- 顶部标题和切换标签 -->
+  <view class="header">
+    <view class="title">我的收藏</view>
+    <view class="tabs">
+      <view 
+        class="tab-item {{activeTab === 'places' ? 'active' : ''}}" 
+        bindtap="switchTab" 
+        data-tab="places"
+      >
+        地点
+      </view>
+      <view 
+        class="tab-item {{activeTab === 'notes' ? 'active' : ''}}" 
+        bindtap="switchTab" 
+        data-tab="notes"
+      >
+        游记
+      </view>
+      <view 
+        class="tab-item {{activeTab === 'products' ? 'active' : ''}}" 
+        bindtap="switchTab" 
+        data-tab="products"
+      >
+        商品
+      </view>
+    </view>
+  </view>
+  
+  <!-- 收藏内容列表 -->
+  <view class="favorites-list">
+    <block wx:if="{{activeTab === 'places'}}">
+      <!-- 地点收藏 -->
+      <view class="empty-state" wx:if="{{places.length === 0}}">
+        <view class="empty-text">暂无收藏地点</view>
+      </view>
+      
+      <block wx:for="{{places}}" wx:key="id">
+        <view class="place-item" bindtap="viewPlaceDetail" data-id="{{item.id}}">
+          <view class="place-info">
+            <view class="place-name">{{item.name}}</view>
+            <view class="place-location">
+              <text class="icon">📍</text>
+              <text>{{item.location}}</text>
+            </view>
+            <view class="place-tags">
+              <text wx:for="{{item.tags}}" wx:key="index">{{item}}</text>
+            </view>
+          </view>
+        </view>
+      </block>
+    </block>
+    
+    <block wx:if="{{activeTab === 'notes'}}">
+      <!-- 游记收藏 -->
+      <view class="empty-state" wx:if="{{notes.length === 0}}">
+        <view class="empty-text">暂无收藏游记</view>
+      </view>
+      
+      <block wx:for="{{notes}}" wx:key="id">
+        <view class="note-item" bindtap="viewNoteDetail" data-id="{{item.id}}">
+          <image src="{{item.coverImage}}" class="note-cover"></image>
+          <view class="note-info">
+            <view class="note-title">{{item.title}}</view>
+            <view class="note-author">作者: {{item.author}}</view>
+            <view class="note-stats">
+              <text>👍 {{item.likes}}</text>
+              <text>👁️ {{item.views}}</text>
+            </view>
+          </view>
+        </view>
+      </block>
+    </block>
+    
+    <block wx:if="{{activeTab === 'products'}}">
+      <!-- 商品收藏 -->
+      <view class="empty-state" wx:if="{{products.length === 0}}">
+        <view class="empty-text">暂无收藏商品</view>
+      </view>
+      
+      <view class="products-grid">
+        <block wx:for="{{products}}" wx:key="id">
+          <view class="product-item" bindtap="viewProductDetail" data-id="{{item.id}}">
+            <image src="{{item.image}}" class="product-image"></image>
+            <view class="product-info">
+              <view class="product-name">{{item.name}}</view>
+              <view class="product-price">¥{{item.price}}</view>
+            </view>
+          </view>
+        </block>
+      </view>
+    </block>
+  </view>
+</view>

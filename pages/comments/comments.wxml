@@ -1,0 +1,39 @@
+<!-- pages/comments/comments.wxml -->
+<view class="container">
+  <!-- 原动态内容 -->
+  <view class="original-post">
+    <view class="user-info">
+      <image class="avatar" src="{{currentFeed.avatar}}"></image>
+      <text class="username">{{currentFeed.username}}</text>
+      <text class="time">{{currentFeed.time}}</text>
+    </view>
+    <view class="content">{{currentFeed.content}}</view>
+    <view class="images" wx:if="{{currentFeed.images.length > 0}}">
+      <image wx:for="{{currentFeed.images}}" wx:key="*this" src="{{item}}" mode="aspectFill"></image>
+    </view>
+  </view>
+
+  <!-- 评论列表 -->
+  <view class="comments-list">
+    <view class="comment-item" wx:for="{{comments}}" wx:key="id">
+      <image class="avatar" src="{{item.avatar}}"></image>
+      <view class="comment-content">
+        <text class="username">{{item.username}}</text>
+        <text class="text">{{item.content}}</text>
+        <text class="time">{{item.time}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 评论输入框 -->
+  <view class="comment-input">
+    <input 
+      placeholder="写下你的评论..." 
+      focus="{{autoFocus}}"
+      bindinput="onInput"
+      value="{{inputValue}}"
+      class="comment-input-input"
+    />
+    <button size="mini" bindtap="submitComment" disabled="{{!inputValue}}">发送</button>
+  </view>
+</view>

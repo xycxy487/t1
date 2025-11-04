@@ -1,0 +1,28 @@
+<!-- pages/myTrips/myTrips.wxml -->
+<view class="trips-container">
+  <!-- 顶部标题 -->
+  <view class="header">
+    <view class="title">我的行程</view>
+  </view>
+  
+  <!-- 行程列表 -->
+  <view class="trip-list">
+    <block wx:for="{{trips}}" wx:key="id">
+      <view class="trip-item" bindtap="viewTripDetail" data-id="{{item.id}}">
+        <view class="trip-info">
+          <view class="trip-title">{{item.title}}</view>
+          <view class="trip-date">{{item.date}}</view>
+          <view class="trip-location">
+            <text class="icon">📍</text>
+            <text>{{item.location}}</text>
+          </view>
+        </view>
+      </view>
+    </block>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty-state" wx:if="{{trips.length === 0}}">
+    <view class="empty-text">暂无行程记录</view>
+  </view>
+</view>

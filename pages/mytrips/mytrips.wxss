@@ -1,0 +1,81 @@
+/* pages/myTrips/myTrips.wxss */
+.trips-container {
+  padding: 20rpx;
+}
+
+.header {
+  padding: 30rpx 0;
+  text-align: center;
+}
+
+.title {
+  font-size: 36rpx;
+  font-weight: bold;
+}
+
+.trip-list {
+  margin-top: 20rpx;
+}
+
+.trip-item {
+  display: flex;
+  margin-bottom: 30rpx;
+  padding: 20rpx;
+  background: #fff;
+  border-radius: 12rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.05);
+}
+
+.trip-cover {
+  width: 200rpx;
+  height: 150rpx;
+  border-radius: 8rpx;
+  margin-right: 20rpx;
+}
+
+.trip-info {
+  flex: 1;
+}
+
+.trip-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  margin-bottom: 10rpx;
+}
+
+.trip-date {
+  font-size: 24rpx;
+  color: #888;
+  margin-bottom: 10rpx;
+}
+
+.trip-location {
+  font-size: 26rpx;
+  color: #666;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 100rpx;
+}
+
+.empty-image {
+  width: 300rpx;
+  height: 300rpx;
+  margin-bottom: 30rpx;
+}
+
+.empty-text {
+  font-size: 28rpx;
+  color: #999;
+  margin-bottom: 40rpx;
+}
+
+.add-btn {
+  background-color: #07C160;
+  color: white;
+  width: 60%;
+}

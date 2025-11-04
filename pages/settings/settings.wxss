@@ -1,0 +1,70 @@
+/* pages/settings/settings.wxss */
+.settings-container {
+  padding: 20rpx;
+  background-color: #f7f7f7;
+  min-height: 100vh;
+}
+
+.header {
+  padding: 30rpx 0;
+}
+
+.title {
+  font-size: 36rpx;
+  font-weight: bold;
+  text-align: center;
+}
+
+.settings-list {
+  margin-top: 30rpx;
+}
+
+.settings-group {
+  background-color: #fff;
+  border-radius: 12rpx;
+  margin-bottom: 30rpx;
+  overflow: hidden;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.05);
+}
+
+.group-title {
+  padding: 20rpx 30rpx;
+  font-size: 28rpx;
+  color: #999;
+  border-bottom: 1rpx solid #f5f5f5;
+}
+
+.settings-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 25rpx 30rpx;
+  font-size: 30rpx;
+  border-bottom: 1rpx solid #f5f5f5;
+}
+
+.settings-item:last-child {
+  border-bottom: none;
+}
+
+.arrow-icon {
+  width: 30rpx;
+  height: 30rpx;
+}
+
+.cache-size, .version {
+  font-size: 26rpx;
+  color: #999;
+}
+
+.logout-btn {
+  margin-top: 50rpx;
+  background-color: #fff;
+  color: #f44;
+  text-align: center;
+  padding: 25rpx;
+  border-radius: 12rpx;
+  font-size: 32rpx;
+  font-weight: bold;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.05);
+}

@@ -1,0 +1,55 @@
+<!--index.wxml-->
+<view class="container">
+  <!-- 搜索框 -->
+  <view class="search-bar">
+    <input 
+     placeholder="搜索目的地、景点..." 
+     class="search-input" 
+     bindinput="onSearchInput"
+     bindconfirm="onSearchConfirm"
+     confirm-type="search"
+     value="{{searchKeyword}}"
+    />
+    <button 
+      class="search-btn" 
+      bindtap="onSearchConfirm"
+    >
+      搜索
+    </button>
+  </view>
+ 
+  <!-- 图 -->
+  <image src="/images/banner/ba2.jpg" class="banner"></image>
+  
+  <!-- 热门推荐 -->
+  <view class="section">
+    <view class="section-title">热门推荐</view>
+    <view class="hot-list">
+      <view class="hot-item" wx:for="{{hotList}}" wx:key="id" bindtap="navigateToDetail" data-id="{{item.id}}">
+        <image src="{{item.image}}" class="hot-image"></image>
+        <view class="hot-info">
+          <view class="hot-name">{{item.name}}</view>
+          <view class="hot-desc">{{item.desc}}</view>
+          <view class="hot-price">¥{{item.price}}起</view>
+        </view>
+      </view>
+    </view>
+  </view>
+  
+  <!-- 旅游攻略 -->
+  <view class="section">
+    <view class="section-title">旅游攻略</view>
+    <view class="strategy-list">
+      <view class="strategy-item" wx:for="{{strategies}}" wx:key="id">
+        <image src="{{item.cover}}" class="strategy-cover"></image>
+        <view class="strategy-content">
+          <view class="strategy-title">{{item.title}}</view>
+          <view class="strategy-meta">
+            <text>{{item.author}}</text>
+            <text>{{item.date}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>
