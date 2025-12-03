@@ -10,49 +10,110 @@ Page({
   },
 
   onLoad: function() {
-    this.loadUserData()
+    console.log('profile页面加载，全局用户信息:', getApp().globalData.userInfo);
+    this.loadUserData();
   },
 
   onShow: function() {
-    this.loadUserData()
+    console.log('profile页面显示，全局用户信息:', getApp().globalData.userInfo);
+    this.loadUserData();
   },
 
   loadUserData: function() {
-    const app = getApp()
-    this.setData({
-      userInfo: app.globalData.userInfo || {}
-    })
+    const app = getApp();
+    const userInfo = app.getGlobalUserInfo();
     
-    // 这里可以添加从服务器获取统计数据的逻辑
+    console.log('加载用户数据:', userInfo);
+    
+    if (userInfo && Object.keys(userInfo).length > 0) {
+      this.setData({
+        userInfo: userInfo
+      });
+      console.log('用户信息设置成功');
+    } else {
+      console.log('用户信息为空，尝试从缓存恢复');
+      if (app.checkLoginStatus()) {
+        const refreshedUserInfo = app.getGlobalUserInfo();
+        this.setData({
+          userInfo: refreshedUserInfo || {}
+        });
+      } else {
+        console.log('用户未登录，跳转到登录页');
+        wx.redirectTo({
+          url: '/pages/login/login'
+        });
+      }
+    }
   },
   
   navigateToEdit: function() {
+    const app = getApp();
+    if (!app.checkLoginStatus()) {
+      wx.redirectTo({
+        url: '/pages/login/login'
+      });
+      return;
+    }
+    
     wx.navigateTo({
       url: '/pages/editprofile/editprofile',
-    })
+    });
   },
   
-  navigateToMyTrips() {
+  navigateToMyTrips: function() {
+    const app = getApp();
+    if (!app.checkLoginStatus()) {
+      wx.redirectTo({
+        url: '/pages/login/login'
+      });
+      return;
+    }
+    
     wx.navigateTo({
       url: '/pages/mytrips/mytrips'
-    })
+    });
   },
   
-  navigateToFavorites() {
+  navigateToFavorites: function() {
+    const app = getApp();
+    if (!app.checkLoginStatus()) {
+      wx.redirectTo({
+        url: '/pages/login/login'
+      });
+      return;
+    }
+    
     wx.navigateTo({
       url: '/pages/favorites/favorites'
-    })
+    });
   },
   
-  navigateToOrders() {
+  navigateToOrders: function() {
+    const app = getApp();
+    if (!app.checkLoginStatus()) {
+      wx.redirectTo({
+        url: '/pages/login/login'
+      });
+      return;
+    }
+    
     wx.navigateTo({
       url: '/pages/orders/orders'
-    })
+    });
   },
   
-  navigateToSettings() {
+  navigateToSettings: function() {
+    const app = getApp();
+    if (!app.checkLoginStatus()) {
+      wx.redirectTo({
+        url: '/pages/login/login'
+      });
+      return;
+    }
+    
     wx.navigateTo({
       url: '/pages/settings/settings'
-    })
+    });
   }
 })
+
