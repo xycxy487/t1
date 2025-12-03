@@ -3,7 +3,8 @@
   "projectname": "work1",
   "setting": {
     "compileHotReLoad": true,
-    "bigPackageSizeSupport": true
+    "bigPackageSizeSupport": true,
+    "urlCheck": false
   },
   "condition": {
     "miniprogram": {

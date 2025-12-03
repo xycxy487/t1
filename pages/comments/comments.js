@@ -1,119 +1,114 @@
 // pages/comments/comments.js
 Page({
   data: {
-    currentFeed: null,
+    feedId: null,
     comments: [],
-    inputValue: '',
-    autoFocus: false,
-    currentUser: null
+    commentContent: '',
+    currentFeed: null
   },
-
-  onLoad(options) {
-    const id = parseInt(options.id);
-    const app = getApp();
+  
+  onLoad: function(options) {
+    console.log('评论页面参数:', options);
+    const feedId = options.feedId;
     
-    // 获取当前用户信息（确保已登录）
-    const currentUser = app.globalData.userInfo || {
-      username: '匿名用户',
-      avatar: '/images/tab/de.png'
-    };
-    
-    // 从全局获取动态数据
-    const feed = (app.globalData.feeds || []).find(item => item.id === id);
-    
-    // 从全局获取评论数据（优先使用全局数据，没有则用缓存）
-    const comments = app.globalData.comments?.[id] || 
-                    wx.getStorageSync('comments_' + id) || 
-                    [];
-    
-    this.setData({
-      currentFeed: feed || {},
-      comments: comments,
-      currentUser: currentUser
-    });
-  },
-
-  onInput(e) {
-    this.setData({
-      inputValue: e.detail.value
-    });
-  },
-
-  submitComment() {
-    const { inputValue, currentFeed, currentUser } = this.data;
-    if (!inputValue.trim() || !currentFeed.id) return;
-    
-    const app = getApp();
-    const newComment = {
-      id: Date.now(),
-      feedId: currentFeed.id,
-      username: currentUser.username,
-      avatar: currentUser.avatar,
-      content: inputValue.trim(),
-      time: this.formatTime(new Date())
-    };
-    
-    // 更新数据
-    const updatedComments = [newComment, ...this.data.comments];
-    
-    // 更新全局数据
-    if (!app.globalData.comments) {
-      app.globalData.comments = {};
-    }
-    app.globalData.comments[currentFeed.id] = updatedComments;
-    
-    // 更新本地缓存
-    try {
-      wx.setStorageSync('comments_' + currentFeed.id, updatedComments);
-    } catch (e) {
-      console.error('存储评论失败:', e);
-    }
-    
-    // 更新页面数据
-    this.setData({
-      comments: updatedComments,
-      inputValue: '',
-      autoFocus: true
-    });
-    
-    // 更新原动态的评论数
-    this.updateFeedCommentCount(updatedComments.length);
-  },
-
-  updateFeedCommentCount(newCount) {
-    const app = getApp();
-    const feedId = this.data.currentFeed.id;
-    
-    if (app.globalData.feeds) {
-      const updatedFeeds = app.globalData.feeds.map(feed => {
-        if (feed.id === feedId) {
-          return { ...feed, comments: newCount };
-        }
-        return feed;
+    if (!feedId) {
+      wx.showToast({
+        title: '动态不存在',
+        icon: 'none'
       });
-      
-      app.globalData.feeds = updatedFeeds;
-      
-      // 触发父页面更新（如果需要）
-      const pages = getCurrentPages();
-      if (pages.length > 1) {
-        const prevPage = pages[pages.length - 2];
-        prevPage.setData({ feeds: updatedFeeds });
-      }
+      wx.navigateBack();
+      return;
+    }
+    
+    this.setData({ feedId: feedId });
+    this.loadComments(feedId);
+    this.loadFeedInfo(feedId);
+  },
+  
+  // 加载评论列表
+  loadComments: function(feedId) {
+    const app = getApp();
+    wx.showLoading({
+      title: '加载评论...',
+    });
+    
+    app.getCommentsFromDB(feedId).then(comments => {
+      this.setData({ 
+        comments: comments || []
+      });
+      wx.hideLoading();
+      console.log('评论数据:', comments);
+    }).catch(err => {
+      console.error('加载评论失败:', err);
+      wx.hideLoading();
+      this.setData({ comments: [] });
+    });
+  },
+  
+  // 加载动态信息
+  loadFeedInfo: function(feedId) {
+    const app = getApp();
+    const feeds = app.globalData.feeds || [];
+    const currentFeed = feeds.find(feed => feed.id == feedId);
+    
+    if (currentFeed) {
+      this.setData({ currentFeed: currentFeed });
     }
   },
-
-  formatTime(date) {
-    const now = new Date();
-    const diff = now - date;
+  
+  // 输入评论内容
+  onCommentInput: function(e) {
+    this.setData({
+      commentContent: e.detail.value
+    });
+  },
+  
+  // 提交评论
+  submitComment: function() {
+    const content = this.data.commentContent.trim();
+    if (!content) {
+      wx.showToast({
+        title: '请输入评论内容',
+        icon: 'none'
+      });
+      return;
+    }
     
-    if (diff < 60000) return '刚刚';
-    if (diff < 3600000) return `${Math.floor(diff/60000)}分钟前`;
-    if (diff < 86400000) return `${Math.floor(diff/3600000)}小时前`;
+    const app = getApp();
+    const userInfo = app.getGlobalUserInfo();
     
-    const year = date.getFullYear();
-    const month = date.getMonth() + 1;
-    const day = date.getDate();
-    return `${year}-${month < 10 ? '0' + month : month}-${day < 10 ? '0' + day : day}`;
+    if (!userInfo) {
+      wx.showToast({
+        title: '请先登录',
+        icon: 'none'
+      });
+      return;
+    }
+    
+    wx.showLoading({
+      title: '发布中...',
+    });
+    
+    // 调用添加评论API
+    app.addCommentToDB(this.data.feedId, content).then(() => {
+      this.setData({ commentContent: '' });
+      this.loadComments(this.data.feedId); // 重新加载评论
+      wx.hideLoading();
+      wx.showToast({
+        title: '评论成功',
+        icon: 'success'
+      });
+    }).catch(err => {
+      wx.hideLoading();
+      wx.showToast({
+        title: '评论失败',
+        icon: 'none'
+      });
+    });
+  },
+  
+  // 返回上一页
+  goBack: function() {
+    wx.navigateBack();
   }
 });

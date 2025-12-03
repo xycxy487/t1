@@ -4,67 +4,31 @@ App({
   globalData: {
     userInfo: null,
     isLoggedIn: false,
-    
-    // 示例数据（这些可以保留在globalData中）
-    feeds: [
-      {
-        id: 1,
-        username: '旅行达人',
-        avatar: '/images/chengdu.jpg',
-        time: '3小时前',
-        content: '刚刚从北京回来，故宫真是太壮观了！推荐大家一定要去看看，特别是珍宝馆，里面的文物精美绝伦。',
-        images: ['/images/beijing.jpg'],
-        likes: 24,
-        comments: 2,
-        liked: false
-      },
-      {
-        id: 2,
-        username: '美食探索者',
-        avatar: '/images/shanghai.jpg',
-        time: '昨天',
-        content: '上海的小笼包真的名不虚传，汤汁鲜美，皮薄馅多。推荐城隍庙附近的南翔馒头店，虽然要排队，但绝对值得！',
-        images: ['/images/food.jpg'],
-        likes: 15,
-        comments: 1,
-        liked: false
-      }
-    ],
-    comments: {
-      1: [
-        {
-          id: 101,
-          username: '故宫爱好者',
-          avatar: '/images/hangz.jpg',
-          content: '珍宝馆的翡翠白菜真的惊艳！我去年去看过',
-          time: '1小时前'
-        },
-        {
-          id: 102,
-          username: '历史迷',
-          avatar: '/images/shanghai.jpg',
-          content: '建议早上去，人少的时候更有感觉',
-          time: '45分钟前'
-        }
-      ],
-      2: [
-        {
-          id: 201,
-          username: '吃货小分队',
-          avatar: '/images/banner/ba2.jpg',
-          content: '他们家的蟹粉小笼也是一绝！',
-          time: '昨天'
-        }
-      ]
-    }
+    feeds:[],
+    baseUrl:'http://localhost:3000/api'
   },
 
   // 设置全局用户信息
   setGlobalUserInfo: function(userInfo) {
-    this.globalData.userInfo = userInfo;
-    this.globalData.isLoggedIn = true;
-    console.log('全局用户信息已设置:', userInfo);
-  },
+  if (!userInfo) return false;
+  
+  console.log('设置全局用户信息，原始数据:', userInfo);
+  
+  // 适配login.js中的userInfo格式
+  const formattedUserInfo = {
+    username: userInfo.username || '',
+    avatar: userInfo.avatar || '',
+    userId: userInfo.userId || userInfo.id || `user_${Date.now()}`,
+    openid: userInfo.openid || '',
+    loginTime: userInfo.loginTime || new Date().toISOString()
+  };
+  
+  this.globalData.userInfo = formattedUserInfo;
+  this.globalData.isLoggedIn = true;
+  
+  console.log('全局用户信息已设置:', formattedUserInfo);
+  return true;
+},
 
   // 获取全局用户信息
   getGlobalUserInfo: function() {
@@ -72,15 +36,112 @@ App({
   },
 
   // 检查登录状态
-  checkLoginStatus: function() {
-    return this.globalData.isLoggedIn && this.globalData.userInfo !== null;
-  },
+checkLoginStatus: function() {
+  console.log('检查全局登录状态');
+  
+  // 先检查内存中的登录状态
+  if (this.globalData.isLoggedIn && this.globalData.userInfo) {
+    console.log('内存中已登录');
+    return true;
+  }
+  
+  // 如果内存中没有，检查本地缓存
+  try {
+    const userInfo = wx.getStorageSync('userInfo');
+    console.log('从缓存读取用户信息:', userInfo);
+    
+    if (userInfo && typeof userInfo === 'object' && Object.keys(userInfo).length > 0) {
+      // 如果缓存中有有效的用户信息，同步到全局
+      this.setGlobalUserInfo(userInfo);
+      console.log('从缓存恢复登录状态成功');
+      return true;
+    }
+  } catch (e) {
+    console.error('读取缓存失败:', e);
+  }
+  
+  console.log('用户未登录');
+  return false;
+},
 
   // 清除全局用户信息
   clearGlobalUserInfo: function() {
     this.globalData.userInfo = null;
     this.globalData.isLoggedIn = false;
     console.log('全局用户信息已清除');
+  },
+
+  // 获取动态列表（从MySQL数据库）
+  getFeedsFromDB: function() {
+    return new Promise((resolve, reject) => {
+      wx.request({
+        url: `${this.globalData.baseUrl}/feeds`,
+        method: 'GET',
+        success: res => {
+          if (res.data.code === 0) {
+            this.globalData.feeds = res.data.data;
+            resolve(res.data.data);
+          } else {
+            reject(new Error(res.data.message));
+          }
+        },
+        fail: err => {
+          reject(err);
+        }
+      });
+    });
+  },
+
+  // 获取评论列表（从MySQL数据库）
+  getCommentsFromDB: function(feedId) {
+    return new Promise((resolve, reject) => {
+      wx.request({
+        url: `${this.globalData.baseUrl}/comments/${feedId}`,
+        method: 'GET',
+        success: res => {
+          if (res.data.code === 0) {
+            resolve(res.data.data);
+          } else {
+            reject(new Error(res.data.message));
+          }
+        },
+        fail: err => {
+          reject(err);
+        }
+      });
+    });
+  },
+
+  // 添加评论（保存到MySQL数据库）
+  addCommentToDB: function(feedId, content) {
+    return new Promise((resolve, reject) => {
+      const userInfo = this.getGlobalUserInfo();
+      if (!userInfo) {
+        reject(new Error('用户未登录'));
+        return;
+      }
+
+      wx.request({
+        url: `${this.globalData.baseUrl}/comments`,
+        method: 'POST',
+        data: {
+          feed_id: feedId,
+          username: userInfo.username,
+          avatar: userInfo.avatar,
+          content: content
+        },
+        success: res => {
+          if (res.data.code === 0) {
+            resolve(res.data);
+          } else {
+            reject(new Error(res.data.message));
+          }
+        },
+        fail: err => {
+          reject(err);
+        }
+      });
+    });
   },
 
   onLaunch: function() {
@@ -93,6 +154,14 @@ App({
     });
     console.log('云开发初始化完成');
 
+    // 启动时自动同步登录状态
+    this.syncLoginStatus();
+    if (this.checkLoginStatus()) {
+      this.getFeedsFromDB().then(feeds => {
+        console.log('动态数据加载成功', feeds);
+      });
+    }
+
     // 检查登录状态
     if (!this.checkLoginStatus()) {
       // 未登录，强制跳转到登录页
@@ -104,9 +173,15 @@ App({
 
   onShow: function() {
     console.log('小程序显示');
+    this.syncLoginStatus();
   },
 
   onHide: function() {
     console.log('小程序隐藏');
-  }
+  },
+
+  // 同步登录状态
+syncLoginStatus: function() {
+  return this.checkLoginStatus();
+}
 });

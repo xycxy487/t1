@@ -19,7 +19,8 @@
       "disablePlugins": [],
       "outputPath": ""
     },
-    "uglifyFileName": true
+    "uglifyFileName": true,
+    "minifyWXML": true
   },
   "condition": {},
   "editorSetting": {
